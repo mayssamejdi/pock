@@ -73,10 +73,12 @@ public class Interceptor implements HandlerInterceptor{
                     boolean approved = true;
                     variables.put("approved", approved);
                     taskService.complete(task.getId(), variables);
+                    Thread.yield();
                 } else {
                     boolean approved = false;
                     variables.put("approved", approved);
                     taskService.complete(task.getId(), variables);
+                    Thread.yield();
                     response.sendError(401);
                 }
             }

@@ -16,6 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -104,14 +109,30 @@ public class FilesController {
 
     }
 
-    @PostMapping("/download")
-    public void download(@RequestBody DocumentInfo document){
-        cmisService.downloadDocumentByPath(document);
-    }
+//    @PostMapping("/download")
+//    public void download(@RequestBody DocumentInfo document) throws IOException {
+//        cmisService.downloadDocumentByPath(document);
+//    }
 
     @GetMapping("/content")
     public ResponseEntity<List<DocumentInfo>> getContent(){
         List<DocumentInfo> listOfDocs = this.cmisService.getSiteContent();
         return new ResponseEntity<>(listOfDocs,HttpStatus.OK);
     }
+
+    @GetMapping("/download_file")
+    public void downloadFile(String fileName, HttpServletResponse res) throws Exception {
+
+        DocumentInfo documentInfo = new DocumentInfo(fileName);
+        cmisService.downloadDocumentByPath(documentInfo);
+
+        res.setHeader("Content-Disposition","attachment; filename=" +fileName);
+        res.getOutputStream().write(contentOf(fileName));
+    }
+
+    private byte[] contentOf(String fileName) throws Exception{
+        String filePath = "downloads/" + fileName;
+        return Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(filePath).toURI()));
+    }
+
 }
