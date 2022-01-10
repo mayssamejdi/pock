@@ -208,47 +208,7 @@ public class CmisService {
         session.delete(object);
     }
 
-    public void downloadDocumentByPath(){
-
-        String folder = session.getRootFolder().getPath();
-
-        String path = "/Sites/testpoc/documentLibrary/testUpload/cv_khalil.pdf";
-
-        Document doc = (Document) session.getObjectByPath(path);
-
-        try{
-
-            ContentStream cs = doc.getContentStream(null);
-            BufferedInputStream in = new BufferedInputStream(cs.getStream());
-            File file = new File("C:\\Users\\khalil.beldi\\Desktop\\" + doc.getName());
-            file.createNewFile();
-            FileOutputStream fos = new FileOutputStream(file);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
-
-            byte[] buf = new byte[1024];
-
-            int n = 0;
-
-            while ((n = in.read(buf)) > 0){
-
-                bos.write(buf,0,n);
-
-            }
-
-            bos.close();
-            fos.close();
-            in.close();
-
-
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void downloadDocumentByPath(DocumentInfo document){
+    public void downloadDocumentByPath(DocumentInfo document) throws IOException {
 
         String folder = session.getRootFolder().getPath();
 
@@ -258,18 +218,21 @@ public class CmisService {
 
         Document doc = (Document) session.getObjectByPath(path);
 
+
+
+        ContentStream cs = doc.getContentStream(null);
+        BufferedInputStream in = new BufferedInputStream(cs.getStream());
+        File file = new File("src/main/resources/downloads/" + doc.getName());
+        file.createNewFile();
+        FileOutputStream fos = new FileOutputStream(file);
+
+        BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+        byte[] buf = new byte[1024];
+
+        int n = 0;
+
         try{
-
-            ContentStream cs = doc.getContentStream(null);
-            BufferedInputStream in = new BufferedInputStream(cs.getStream());
-            File file = new File("C:\\Users\\khalil.beldi\\Desktop\\" + doc.getName());
-            file.createNewFile();
-            FileOutputStream fos = new FileOutputStream(file);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
-
-            byte[] buf = new byte[1024];
-
-            int n = 0;
 
             while ((n = in.read(buf)) > 0){
 
@@ -289,6 +252,7 @@ public class CmisService {
         }
 
     }
+
 
 
     private Session getSession() {
