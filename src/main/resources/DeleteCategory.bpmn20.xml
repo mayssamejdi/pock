@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef" design:palette="flowable-process-palette">
+    <process id="DeletionRequest" name="Deletion Request" isExecutable="true">
+        <extensionElements>
+            <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+            <design:creationdate><![CDATA[2021-12-07T13:38:38.560Z]]></design:creationdate>
+            <design:modificationdate><![CDATA[2021-12-07T14:06:15.853Z]]></design:modificationdate>
+        </extensionElements>
+        <startEvent id="startEvent" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </startEvent>
+        <sequenceFlow id="sequenceFlow-be91400d-1108-40cc-853c-ce05b27606ed" name="Delete Request" sourceRef="startEvent" targetRef="approveDeletion">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <userTask id="approveDeletion" name="Approve or reject category deletion" flowable:candidateGroups="managers" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="sequenceFlow-8f5ea21a-8b22-4e36-8488-0fbbe988b9a6" sourceRef="approveDeletion" targetRef="DeleteDecision">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <exclusiveGateway id="DeleteDecision">
+            <extensionElements>
+                <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+            </extensionElements>
+        </exclusiveGateway>
+        <sequenceFlow id="sequenceFlow-9139a141-0668-420b-ad4b-6581af6677f9" name="Request Accepted" sourceRef="DeleteDecision" targetRef="SendDeleteConfirmationMail">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow-22ade097-3775-4c5b-95e7-8e361ebe7ddb" name="Request Rejected" sourceRef="DeleteDecision" targetRef="sendDeleteTRejectionMail">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!approved}]]></conditionExpression>
+        </sequenceFlow>
+        <serviceTask id="SendDeleteConfirmationMail" name="Send Confirmation Mail" flowable:class="integration.flowable_work.SendMail">
+            <extensionElements>
+                <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </serviceTask>
+        <sequenceFlow id="sequenceFlow-2b133cf5-f388-49f4-aea6-8bc31208b08c" sourceRef="SendDeleteConfirmationMail" targetRef="MailSended">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <serviceTask id="MailSended" name="Mail Sending" flowable:class="integration.mail.SendConfirmation">
+            <extensionElements>
+                <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </serviceTask>
+        <serviceTask id="sendDeleteTRejectionMail" name="Send Rejection Mail" flowable:class="integration.flowable_work.SendMail">
+            <extensionElements>
+                <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </serviceTask>
+        <sequenceFlow id="sequenceFlow8" sourceRef="sendDeleteTRejectionMail" targetRef="MailSended">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow9" sourceRef="MailSended" targetRef="End">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <endEvent id="End">
+            <extensionElements>
+                <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </endEvent>
+        <userTask id="formTask2" name="Approve or Reject Category Updation" flowable:candidateGroups="managers" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="sequenceFlow10" name="Update Request" sourceRef="startEvent" targetRef="formTask2">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <exclusiveGateway id="UpdateDecision">
+            <extensionElements>
+                <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+            </extensionElements>
+        </exclusiveGateway>
+        <serviceTask id="SendUpdateConfirmationMail" name="Send Confirmation Mail" flowable:class="integration.flowable_work.SendMail">
+            <extensionElements>
+                <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </serviceTask>
+        <serviceTask id="sendUpdateTRejectionMail" name="Send Rejection Mail" flowable:class="integration.flowable_work.SendMail">
+            <extensionElements>
+                <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </serviceTask>
+        <sequenceFlow id="sequenceFlow11" sourceRef="formTask2" targetRef="UpdateDecision">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow12" sourceRef="UpdateDecision" targetRef="SendUpdateConfirmationMail">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow13" sourceRef="UpdateDecision" targetRef="sendUpdateTRejectionMail">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <serviceTask id="serviceTask6" name="Mail Sending" flowable:class="integration.mail.SendConfirmation">
+            <extensionElements>
+                <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </serviceTask>
+        <sequenceFlow id="sequenceFlow14" sourceRef="SendUpdateConfirmationMail" targetRef="serviceTask6">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow15" sourceRef="sendUpdateTRejectionMail" targetRef="serviceTask6">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow16" sourceRef="serviceTask6" targetRef="serviceTask7">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <serviceTask id="serviceTask7" name="Add User to authorized List" flowable:class="integration.mail.SendConfirmation">
+            <extensionElements>
+                <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </serviceTask>
+        <sequenceFlow id="sequenceFlow17" sourceRef="serviceTask7" targetRef="End">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+    </process>
+</definitions>
